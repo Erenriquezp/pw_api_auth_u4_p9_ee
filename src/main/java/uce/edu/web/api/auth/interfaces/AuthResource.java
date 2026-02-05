@@ -3,6 +3,8 @@ package uce.edu.web.api.auth.interfaces;
 import java.time.Instant;
 import java.util.Set;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import io.smallrye.jwt.build.Jwt;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -19,6 +21,13 @@ public class AuthResource {
     @Inject
     UsuarioService usuarioService;
 
+    // INYECCIÓN DE PROPIEDADES (Lee del application.properties)
+    @ConfigProperty(name = "auth.issuer")
+    String issuer;
+
+    @ConfigProperty(name = "auth.token.ttl")
+    Long ttl;
+
     @GET
     @Path("/token")
     @Produces(MediaType.APPLICATION_JSON)
@@ -34,9 +43,7 @@ public class AuthResource {
         //String role = "admin";
         UsuarioRepresentation usuario = usuarioService.validarCredenciales(user, password);
         if (usuario != null) {
-            String issuer = "matricula-auth";
-            long ttl = 3600;
- 
+            
             Instant now = Instant.now();
             Instant exp = now.plusSeconds(ttl);
  
@@ -51,7 +58,6 @@ public class AuthResource {
         } else {
             return null; // manejar error de autenticación
         }
-       
     }  
 
     public static class TokenResponse {
