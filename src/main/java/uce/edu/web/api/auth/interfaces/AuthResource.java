@@ -12,6 +12,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import uce.edu.web.api.auth.application.UsuarioService;
 import uce.edu.web.api.auth.application.representation.UsuarioRepresentation;
 
@@ -31,7 +32,7 @@ public class AuthResource {
     @GET
     @Path("/token")
     @Produces(MediaType.APPLICATION_JSON)
-    public TokenResponse token(
+    public Response token(
             @QueryParam("user") String user,
             @QueryParam("password") String password
     ) {
@@ -54,9 +55,10 @@ public class AuthResource {
                 .expiresAt(exp)
                 .sign();
  
-            return new TokenResponse(jwt, exp.getEpochSecond(), usuario.rol);
+            TokenResponse tokenResponse = new TokenResponse(jwt, exp.getEpochSecond(), usuario.rol);
+            return Response.ok(tokenResponse).build();
         } else {
-            return null; // manejar error de autenticación
+            return Response.status(Response.Status.UNAUTHORIZED).build();        
         }
     }  
 
