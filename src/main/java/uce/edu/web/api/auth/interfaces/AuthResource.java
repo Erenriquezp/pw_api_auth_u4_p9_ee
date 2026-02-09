@@ -22,7 +22,6 @@ public class AuthResource {
     @Inject
     UsuarioService usuarioService;
 
-    // INYECCIÓN DE PROPIEDADES (Lee del application.properties)
     @ConfigProperty(name = "auth.issuer")
     String issuer;
 
@@ -36,12 +35,6 @@ public class AuthResource {
             @QueryParam("user") String user,
             @QueryParam("password") String password
     ) {
-
-        // Donde se compara el password y usuario con la base
-        // TAREA: Implementar la validación contra una base de datos
-        // Crear tabla usuarios (id, user, password, role)
-        // boolean ok = true;
-        //String role = "admin";
         UsuarioRepresentation usuario = usuarioService.validarCredenciales(user, password);
         if (usuario != null) {
             
@@ -50,7 +43,7 @@ public class AuthResource {
  
             String jwt = Jwt.issuer(issuer)
                 .subject(usuario.username)
-                .groups(Set.of(usuario.rol))     // roles: user / admin
+                .groups(Set.of(usuario.rol)) 
                 .issuedAt(now)
                 .expiresAt(exp)
                 .sign();
